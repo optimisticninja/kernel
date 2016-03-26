@@ -1,0 +1,10 @@
+Finish libc/k
+	* Getting libraries compiled in a dynamic manner
+Directory builder
+	* Try not to make directory building its own rule, find a way to see if the output directory exists.
+	  If it doesn't, create it with the object.
+QEMU
+cpuinfo
+ctags
+.gdbinit
+.vimrc

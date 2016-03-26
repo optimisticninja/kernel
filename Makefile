@@ -5,7 +5,8 @@ include kernel/Makefile-kernel.mk \
 
 # ARCHITECTURE SPECIFIC MAKE INCLUDE
 ifeq ($(arch), i386)
-	include kernel/arch/i386/make.config
+	include kernel/arch/i386/make.config \
+			libc/arch/i386/make.config
 endif
 
 CSTD = -std=gnu11
@@ -43,6 +44,7 @@ endif
 
 # TODO: If no target architecture specified do dialog to ask whether to clean all or not
 clean: clean-libc clean-kernel
+	find sysroot/usr/include -name '*.h' -type f -delete
 
 # MAKEFILE DEBUGGING STUFF
 
