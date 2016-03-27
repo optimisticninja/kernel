@@ -4,11 +4,11 @@ LIBC_SOURCES := $(shell find libc -name **.c)
 LIBC_OBJECTS := $(shell echo $(LIBC_SOURCES:.c=.o) | sed 's/libc/build\/libc/g')
 LIBK_OBJECTS := $(shell echo $(LIBC_OBJECTS:.o=.libk.o))
 
-CPP_FLAGS = -D__is_libc -I libc/include
+CPP_FLAGS = -D__is_libc
 LIBK_CFLAGS = $(CFLAGS)
 LIBK_CPPFLAGS = $(CPP_FLAGS) -D__is_kernel
 
-INCLUDES = -Ilibc/include -Ikernel/include
+LIBK_INCLUDES = $(INCLUDES) -Ikernel/include
 
 all-libc:
 	$(MAKE) $(LIBC_OBJECTS)
@@ -23,13 +23,13 @@ build/libg.a:
 	$(AR) rcs $@
 
 build/libk.a: $(LIBK_OBJECTS)
-	$(AR) rcs $@
+	$(AR) rcs $@ $^
 
 $(LIBC_OBJECTS): build%.o: .%.c
 	$(CC) $(INCLUDES) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 $(LIBK_OBJECTS): build%libk.o: .%c
-	$(CC) $(INCLUDES) $(LIBK_CFLAGS) $(LIBK_CPPFLAGS) -c $< -o $@
+	$(CC) $(LIBK_INCLUDES) $(LIBK_CFLAGS) $(LIBK_CPPFLAGS) -c $< -o $@
 
 install-libc-headers:
 	mkdir -p $(DESTDIR)$(INCLUDEDIR)
