@@ -22,7 +22,7 @@ link: build/$(ARCHDIR)/crti.o \
 		$(KERNEL_OBJECTS) \
 		$(CRTEND_OBJECT) \
 		build/$(ARCHDIR)/crtn.o
-	$(LD) -o build/kernel.elf $^ $(LDFLAGS) $(LIBS)
+	$(LD) --verbose -o build/kernel.elf $^ $(LDFLAGS) $(LIBS)
 
 # Confirmed working
 $(KERNEL_OBJECTS): build%.o: kernel%.c

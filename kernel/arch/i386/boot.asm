@@ -36,9 +36,9 @@ start:
 	call _init			; Global constructors
 
 	push ebx			; Push multiboot struct onto stack
+	cli	
 	call kmain
 	
-	cli
 	jmp $
 
 
