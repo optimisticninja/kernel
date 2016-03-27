@@ -18,16 +18,9 @@ uint16_t* terminal_buffer;
 
 void terminal_initialize()
 {
-	terminal_row = 0;
-	terminal_column = 0;
 	terminal_color = make_color(COLOR_BLACK, COLOR_YELLOW);
 	terminal_buffer = VGA_MEM_START;
-	for (size_t y = 0; y < VGA_HEIGHT; y++) {
-		for (size_t x = 0; x < VGA_WIDTH; x++) {
-			const size_t index = y * VGA_WIDTH + x;
-			terminal_buffer[index] = make_vgaentry(' ', terminal_color);
-		}
-	}
+	terminal_clear();
 }
 
 static void move_cursor()

@@ -15,6 +15,9 @@ link: build/$(ARCHDIR)/crti.o \
 		$(CRTBEGIN_OBJECT) \
 		build/$(ARCHDIR)/boot.o \
 		build/$(ARCHDIR)/io.o \
+		build/$(ARCHDIR)/idt.o \
+		build/$(ARCHDIR)/gdt.o \
+		build/$(ARCHDIR)/interrupt.o \
 		$(KERNEL_ARCH_C_OBJECTS) \
 		$(KERNEL_OBJECTS) \
 		$(CRTEND_OBJECT) \
