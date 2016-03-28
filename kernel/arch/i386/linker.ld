@@ -14,29 +14,28 @@ SECTIONS
 	.text BLOCK(4K) : ALIGN(4K)
 	{
 		*(.multiboot)
+		code = .; _code = .; __code = .;
 		*(.text)
-	}
-
-	/* Read-only data. */
-	.rodata BLOCK(4K) : ALIGN(4K)
-	{
-		*(.rodata)
 	}
 
 	/* Read-write data (initialized) */
 	.data BLOCK(4K) : ALIGN(4K)
 	{
+		data = .; _data = .; __data = .;
 		*(.data)
+		*(.rodata)
 	}
 
 	/* Read-write data (uninitialized) and stack */
 	.bss BLOCK(4K) : ALIGN(4K)
 	{
 		*(COMMON)
+		bss = .; _bss = .; __bss = .;
 		*(.bss)
 		*(.bootstrap_stack)
 	}
-
+	
+	end = .; _end = .; __end = .;
 	/* The compiler may produce other sections, put them in the proper place in
 	   in this file, if you'd like to include them in the final kernel. */
 }

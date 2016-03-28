@@ -20,6 +20,9 @@ mboot:
 	dd MBOOT_CHECKSUM
 
 	dd mboot
+	dd code
+	dd bss
+	dd end
 	dd start
 
 
