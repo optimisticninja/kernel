@@ -18,20 +18,15 @@ void kernel_early()
 
 int kmain(__attribute__((__unused__)) Multiboot* mboot_ptr)
 {
-	printf("CRANK KERNEL v1.0 (C) 2015, John Holly\n\n");
+	printf("CRANK KERNEL v1.0 (C) 2015\n\n");
 	init_paging();
-	
-	printf("Interrupts test.\n");
-
-	asm volatile ("int $0x3");
-	asm volatile ("int $0x4");
 
 	printf("Paging test\n");
-
+	asm volatile ("int $0x3");
+	asm volatile ("int $0x4");
 	uint32_t *ptr = (uint32_t*)0xA0000000;
-	__attribute__((__unused__)) uint32_t do_page_fault = *ptr;
 	//asm volatile ("sti");
 	//init_timer(50);
 	
-	return 0xDEADBABA;
+	return *ptr;
 }

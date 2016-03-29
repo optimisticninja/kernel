@@ -8,7 +8,7 @@
 
 uint32_t tick = 0;
 
-static void timer_callback(__attribute__((__unused__)) Registers regs)
+static void timer_callback(__attribute__((__unused__)) Registers* regs)
 {
 	tick++;
 	terminal_writestr("Tick: ");

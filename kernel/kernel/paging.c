@@ -133,16 +133,16 @@ Page *get_page(uint32_t address, int make, PageDirectory *dir)
 }
 
 
-void page_fault(Registers regs)
+void page_fault(Registers* regs)
 {
     uint32_t faulting_address;
     asm volatile("mov %%cr2, %0" : "=r" (faulting_address));
     
-    int present   = !(regs.err_code & 0x1); // Page not present
-    int rw = regs.err_code & 0x2;           // Write operation?
-    int us = regs.err_code & 0x4;           // Processor was in user-mode?
-    int reserved = regs.err_code & 0x8;     // Overwritten CPU-reserved bits of page entry?
-    __attribute__((__unused__)) int id = regs.err_code & 0x10;          // Caused by an instruction fetch?
+    int present   = !(regs->err_code & 0x1); // Page not present
+    int rw = regs->err_code & 0x2;           // Write operation?
+    int us = regs->err_code & 0x4;           // Processor was in user-mode?
+    int reserved = regs->err_code & 0x8;     // Overwritten CPU-reserved bits of page entry?
+    __attribute__((__unused__)) int id = regs->err_code & 0x10;          // Caused by an instruction fetch?
 
     terminal_writestr("Page fault! ( ");
     if (present) {terminal_writestr("present ");}

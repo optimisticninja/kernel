@@ -27,5 +27,5 @@ typedef struct page_directory
 void init_paging();
 void switch_page_directory(PageDirectory* new);
 Page* get_page(uint32_t address, int make, PageDirectory* dir);
-void page_fault(Registers regs);
+void page_fault(Registers* regs);
 

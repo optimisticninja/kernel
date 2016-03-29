@@ -14,9 +14,9 @@ void isr_handler(Registers regs)
 {
 	if (interrupt_handlers[regs.int_no] != 0) {
         ISR handler = interrupt_handlers[regs.int_no];
-        handler(regs);
+        handler(&regs);
     } else {
-        terminal_writestr("unhandled interrupt: ");
+        terminal_writestr("unhandled interrupt: IRQ");
         terminal_write_dec(regs.int_no);
         terminal_putchar('\n');
     }
@@ -26,8 +26,7 @@ void irq_handler(Registers regs)
 {
     // Send an EOI (end of interrupt) signal to the PICs.
     // If this interrupt involved the slave.
-    if (regs.int_no >= 40)
-    {
+    if (regs.int_no >= 40) {
         // Send reset signal to slave.
         outb(0xA0, 0x20);
     }
@@ -37,7 +36,7 @@ void irq_handler(Registers regs)
     if (interrupt_handlers[regs.int_no] != 0)
     {
         ISR handler = interrupt_handlers[regs.int_no];
-        handler(regs);
+        handler(&regs);
     }
 
 }
