@@ -5,6 +5,7 @@
 
 #include <kernel/isr.h>
 #include <kernel/kernel.h>
+#include <kernel/heap.h>
 #include <kernel/tty.h>
 
 #define INDEX_FROM_BIT(a) (a/(8*4))
