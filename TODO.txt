@@ -1,9 +1,0 @@
-Replace all tty_writestr with printf
-
-Directory builder
-	* Try not to make directory building its own rule, find a way to see if the output directory exists.
-	  If it doesn't, create it with the object.
-cpuinfo
-ctags
-.gdbinit
-.vimrc

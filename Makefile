@@ -1,59 +1,43 @@
-include kernel/Makefile-kernel.mk \
-		libc/Makefile-libc.mk
+arch ?= x86_64
+kernel := build/kernel-$(arch).bin
+iso := build/os-$(arch).iso
 
-.DEFAULT_GOAL = all
+linker_script := src/arch/$(arch)/linker.ld
+grub_cfg := src/arch/$(arch)/grub.cfg
+assembly_source_files := $(wildcard src/arch/$(arch)/*.asm)
+assembly_object_files := $(patsubst src/arch/$(arch)/%.asm, \
+	build/arch/$(arch)/%.o, $(assembly_source_files))
+c_source_files := $(wildcard src/*.c)
+c_object_files := $(patsubst src/%.c, \
+	build/%.o, $(c_source_files))
 
-# ARCHITECTURE SPECIFIC MAKE INCLUDE
-ifeq ($(arch), i386)
-	include kernel/arch/i386/make.config \
-			libc/arch/i386/make.config
-ifeq ($(arch), )
-	$(error "Please specify architecture.")
-endif
-endif
+.PHONY: all clean run iso
 
-CSTD = -std=gnu11
-WARNINGS = -Wall -Werror -Wextra
-INCLUDES = -Ilibc/include
-DEBUG_FLAGS = -O0 -g -DDEBUG
-RELEASE_FLAGS = -O2 -DNDEBUG
+all: $(kernel)
 
-# DEBUG/RELEASE
-ifeq ($(mode), release)
-	CFLAGS += -ffreestanding -fbuiltin $(WARNINGS) $(RELEASE_FLAGS) $(INCLUDES)
-else
-	mode = debug
-	CFLAGS += -ffreestanding -fbuiltin $(WARNINGS) $(DEBUG_FLAGS) $(INCLUDES)
-endif
-	
-PREFIX = /usr
-EXEC_PREFIX = ${PREFIX}
-BOOTDIR	= /boot
-LIBDIR = ${EXEC_PREFIX}/lib
-INCLUDEDIR=${PREFIX}/include
+clean:
+	rm -r build
 
-DESTDIR = $(PWD)/sysroot
+run: $(iso)
+	qemu-system-x86_64 -cdrom $(iso)
 
-$(CC) = "${CC} --sysroot=${PWD}/sysroot -isystem=${INCLUDEDIR}"
+iso: $(iso)
 
-all: information all-libc all-kernel
+$(iso): $(kernel) $(grub_cfg)
+	mkdir -p build/isofiles/boot/grub
+	cp $(kernel) build/isofiles/boot/kernel.bin
+	cp $(grub_cfg) build/isofiles/boot/grub
+	grub-mkrescue -d /usr/lib/grub/i386-pc -o $(iso) build/isofiles
+	rm -rfv build/isofiles
 
-information:
-# TODO: Make this accept a list of acceptable architectures
-ifneq ($(arch),i386)
-	@echo $(error Please specify architecture. 'make arch=PREFERRED_ARCHITECTURE')
-endif
-	@echo "Building for "$(arch)" architecture"
-	@echo ".........................."
+$(kernel): $(assembly_object_files) $(c_object_files) $(linker_script)
+	ld -n -T $(linker_script) -o $(kernel) $(assembly_object_files) $(c_object_files)
 
-run: all
-	qemu-system-$(HOSTARCH) -monitor stdio -kernel build/kernel.elf
+# compile assembly files
+build/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
+	mkdir -p $(shell dirname $@)
+	nasm -felf64 $< -o $@
 
-# TODO: If no target architecture specified do dialog to ask whether to clean all or not
-clean: clean-libc clean-kernel
-	find sysroot/usr/include -name '*.h' -type f -delete
-
-# MAKEFILE DEBUGGING STUFF
-
-# Print makefile variables
-print-%  : ; @echo $* = $($*)
+build/%.o: src/%.c
+	mkdir -p $(shell dirname $@)
+	x86_64-elf-gcc -std=gnu11 -c -ffreestanding -Wall -Wextra -Werror -o $@ $<
