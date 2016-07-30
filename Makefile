@@ -2,14 +2,20 @@ ARCH ?= x86_64
 KERNEL := build/kernel-$(ARCH).bin
 ISO := build/os-$(ARCH).iso
 
+AS := nasm
+ASFLAGS := -felf64
+CC := $(ARCH)-elf-gcc
+CSTD := -std=gnu11
+WARNINGS := -Wall -Werror -Wextra
+CFLAGS := $(CSTD) -ffreestanding -nostdlib -nostartfiles $(WARNINGS)
+LIBS := -L../libc/sysroot/usr/lib -lc -lgcc
+
 LINKER_SCRIPT := src/arch/$(ARCH)/linker.ld
 GRUB_CFG := src/arch/$(ARCH)/grub/grub.cfg
 ASSEMBLY_SOURCES := $(wildcard src/arch/$(ARCH)/*.asm)
-ASSEMBLY_OBJECTS := $(patsubst src/arch/$(ARCH)/%.asm, \
-	build/arch/$(ARCH)/%.o, $(ASSEMBLY_SOURCES))
+ASSEMBLY_OBJECTS := $(patsubst src/arch/$(ARCH)/%.asm, build/arch/$(ARCH)/%.o, $(ASSEMBLY_SOURCES))
 C_SOURCES := $(wildcard src/*.c)
-C_OBJECTS := $(patsubst src/%.c, \
-	build/%.o, $(C_SOURCES))
+C_OBJECTS := $(patsubst src/%.c, build/%.o, $(C_SOURCES))
 
 .PHONY: all clean run iso
 
@@ -36,8 +42,8 @@ $(KERNEL): $(ASSEMBLY_OBJECTS) $(C_OBJECTS) $(LINKER_SCRIPT)
 # compile assembly files
 build/arch/$(ARCH)/%.o: src/arch/$(ARCH)/%.asm
 	mkdir -p $(shell dirname $@)
-	nasm -felf64 $< -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 build/%.o: src/%.c
 	mkdir -p $(shell dirname $@)
-	x86_64-elf-gcc -std=gnu11 -c -ffreestanding -Wall -Wextra -Werror -o $@ $<
+	$(CC) $(CFLAGS) $(LIBS) -o $@ $<
