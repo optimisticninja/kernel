@@ -1,5 +1,8 @@
 #pragma once
 
+#include <stddef.h>
+#include <stdint.h>
+
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
 
@@ -22,12 +25,15 @@ typedef enum {
 	COLOR_WHITE = 15,
 } VGAColor;
 
-static inline uint8_t make_color(enum vga_color fg, enum vga_color bg) {
+static inline uint8_t get_color_code(VGAColor fg, VGAColor bg)
+{
 	return fg | bg << 4;
 }
- 
-static inline uint16_t make_vgaentry(char c, uint8_t color) {
+
+static inline uint16_t get_vga_entry(char c, uint8_t color)
+{
 	uint16_t c16 = c;
 	uint16_t color16 = color;
 	return c16 | color16 << 8;
 }
+

@@ -1,40 +1,40 @@
-arch ?= x86_64
-kernel := build/kernel-$(arch).bin
-iso := build/os-$(arch).iso
+ARCH ?= x86_64
+KERNEL := build/kernel-$(ARCH).bin
+ISO := build/os-$(ARCH).iso
 
-linker_script := src/arch/$(arch)/linker.ld
-grub_cfg := src/arch/$(arch)/grub.cfg
-assembly_source_files := $(wildcard src/arch/$(arch)/*.asm)
-assembly_object_files := $(patsubst src/arch/$(arch)/%.asm, \
-	build/arch/$(arch)/%.o, $(assembly_source_files))
-c_source_files := $(wildcard src/*.c)
-c_object_files := $(patsubst src/%.c, \
-	build/%.o, $(c_source_files))
+LINKER_SCRIPT := src/arch/$(ARCH)/linker.ld
+GRUB_CFG := src/arch/$(ARCH)/grub/grub.cfg
+ASSEMBLY_SOURCES := $(wildcard src/arch/$(ARCH)/*.asm)
+ASSEMBLY_OBJECTS := $(patsubst src/arch/$(ARCH)/%.asm, \
+	build/arch/$(ARCH)/%.o, $(ASSEMBLY_SOURCES))
+C_SOURCES := $(wildcard src/*.c)
+C_OBJECTS := $(patsubst src/%.c, \
+	build/%.o, $(C_SOURCES))
 
 .PHONY: all clean run iso
 
-all: $(kernel)
+all: $(KERNEL)
 
 clean:
 	rm -r build
 
-run: $(iso)
-	qemu-system-x86_64 -cdrom $(iso)
+run: $(ISO)
+	qemu-system-x86_64 -monitor stdio -cdrom $(ISO)
 
-iso: $(iso)
+iso: $(ISO)
 
-$(iso): $(kernel) $(grub_cfg)
+$(ISO): $(KERNEL) $(GRUB_CFG)
 	mkdir -p build/isofiles/boot/grub
-	cp $(kernel) build/isofiles/boot/kernel.bin
-	cp $(grub_cfg) build/isofiles/boot/grub
-	grub-mkrescue -d /usr/lib/grub/i386-pc -o $(iso) build/isofiles
+	cp $(KERNEL) build/isofiles/boot/kernel.bin
+	cp $(GRUB_CFG) build/isofiles/boot/grub
+	grub-mkrescue -d /usr/lib/grub/i386-pc -o $(ISO) build/isofiles
 	rm -rfv build/isofiles
 
-$(kernel): $(assembly_object_files) $(c_object_files) $(linker_script)
-	ld -n -T $(linker_script) -o $(kernel) $(assembly_object_files) $(c_object_files)
+$(KERNEL): $(ASSEMBLY_OBJECTS) $(C_OBJECTS) $(LINKER_SCRIPT)
+	ld -n -T $(LINKER_SCRIPT) -o $(KERNEL) $(ASSEMBLY_OBJECTS) $(C_OBJECTS)
 
 # compile assembly files
-build/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
+build/arch/$(ARCH)/%.o: src/arch/$(ARCH)/%.asm
 	mkdir -p $(shell dirname $@)
 	nasm -felf64 $< -o $@
 
