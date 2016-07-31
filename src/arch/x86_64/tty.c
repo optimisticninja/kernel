@@ -20,7 +20,7 @@ static VGAPosition cur_pos;
 static VGAColor cur_color;
 static uint16_t* terminal_buffer;
 
-extern void move_cursor();
+extern void move_cursor(uint16_t pos);
 
 void terminal_clear()
 {
@@ -100,8 +100,8 @@ void terminal_putchar(char c)
 				cur_pos.row++;
 			}
 			
-			__attribute__((__unused__))register uint16_t i asm("ax") = ((cur_pos.row-1) * VGA_WIDTH) + cur_pos.column;
-			move_cursor();
+			//__attribute__((__unused__))register uint16_t i asm("ax") = ((cur_pos.row-1) * VGA_WIDTH) + cur_pos.column;
+			move_cursor(((cur_pos.row-1) * VGA_WIDTH) + cur_pos.column);
 			scroll();
 			break;
 		}
