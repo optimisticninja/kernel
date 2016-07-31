@@ -6,17 +6,29 @@ AS := nasm
 ASFLAGS := -felf64
 CC := $(ARCH)-elf-gcc --sysroot=../libc/sysroot -isystem=/usr/include
 LD := $(ARCH)-elf-ld
+LINKER_SCRIPT := src/arch/$(ARCH)/linker.ld
+LDFLAGS := -n -T $(LINKER_SCRIPT)
 CSTD := -std=gnu11
 WARNINGS := -Wall -Werror -Wextra
-LIBS := -nostdlib -lk
-CFLAGS := $(CSTD) -ffreestanding $(LIBS) $(LIBS) $(WARNINGS) 
+LIBS := -lk
+CFLAGS := $(CSTD) -ffreestanding $(WARNINGS) $(LIBS) 
 
-LINKER_SCRIPT := src/arch/$(ARCH)/linker.ld
 GRUB_CFG := src/arch/$(ARCH)/grub/grub.cfg
 ASSEMBLY_SOURCES := $(wildcard src/arch/$(ARCH)/*.asm)
 ASSEMBLY_OBJECTS := $(patsubst src/arch/$(ARCH)/%.asm, build/arch/$(ARCH)/%.o, $(ASSEMBLY_SOURCES))
 C_SOURCES := $(wildcard src/*.c)
 C_OBJECTS := $(patsubst src/%.c, build/%.o, $(C_SOURCES))
+CRTBEGIN_OBJECT := $(shell $(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=crtbegin.o)
+CRTI_OBJECT := build/arch/x86_64/crti.o
+CRTN_OBJECT := build/arch/x86_64/crtn.o
+CRT_FILTER := $(CRTI_OBJECT) $(CRTN_OBJECT)
+CRTEND_OBJECT := $(shell $(CC) $(CFLAGS) $(LDFLAGS) -print-file-name=crtend.o)
+
+OBJECT_LINK_LIST := \
+	$(CRTI_OBJECT) \
+	$(filter-out $(CRTN_OBJECT), $(filter-out $(CRTI_OBJECT), $(ASSEMBLY_OBJECTS))) \
+	$(C_OBJECTS) \
+	$(CRTN_OBJECT)
 
 .PHONY: all clean run iso
 
@@ -37,8 +49,8 @@ $(ISO): $(KERNEL) $(GRUB_CFG)
 	grub-mkrescue -d /usr/lib/grub/i386-pc -o $(ISO) build/isofiles
 	rm -rfv build/isofiles
 
-$(KERNEL): $(ASSEMBLY_OBJECTS) $(C_OBJECTS) $(LINKER_SCRIPT)
-	$(LD) -n -T $(LINKER_SCRIPT) -o $(KERNEL) $(ASSEMBLY_OBJECTS) $(C_OBJECTS)
+$(KERNEL): $(OBJECT_LINK_LIST) $(LINKER_SCRIPT)
+	$(LD) $(LDFLAGS) $(OBJECT_LINK_LIST) -o $(KERNEL)
 
 # compile assembly files
 build/arch/$(ARCH)/%.o: src/arch/$(ARCH)/%.asm
@@ -47,4 +59,4 @@ build/arch/$(ARCH)/%.o: src/arch/$(ARCH)/%.asm
 
 build/%.o: src/%.c
 	mkdir -p $(shell dirname $@)
-	$(CC) $(CFLAGS) $(LIBS) -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<

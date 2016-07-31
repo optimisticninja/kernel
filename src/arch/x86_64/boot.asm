@@ -1,4 +1,4 @@
-[GLOBAL _start]
+[GLOBAL start]
 [EXTERN long_mode_start]
 
 [SECTION .bss]
@@ -24,9 +24,9 @@ gdt64:
 	dw $ - gdt64 - 1
 	dq gdt64
 
-[SECTION .text]
 BITS 32
-_start:
+[SECTION .text]
+start:
 	mov esp, stack_top
 	
 	call check_multiboot
