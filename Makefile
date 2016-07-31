@@ -39,7 +39,7 @@ OBJECT_LINK_LIST := \
 all: $(KERNEL)
 
 clean:
-	rm -r build
+	rm -rfv build
 
 run: $(ISO)
 	qemu-system-x86_64 -monitor stdio -cdrom $(ISO)
