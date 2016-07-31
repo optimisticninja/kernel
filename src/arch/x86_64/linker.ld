@@ -1,10 +1,10 @@
 ENTRY(start)
 
 SECTIONS {
-	. = VGA_MEMORY;
+	. = 1M;
 
 	.boot : {
-		*(.multiboot_header)
+		*(.multiboot_header)	/* KEEP ensures multiboot is at the beginning */
 	}
 
 	.text : {

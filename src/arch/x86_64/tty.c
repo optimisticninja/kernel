@@ -1,10 +1,9 @@
+#include <kernel/tty.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-
-#include <kernel/tty.h>
-#include <kernel/arch/x86_64/drivers/vga.h>
 
 typedef struct {
 	size_t row;
@@ -52,7 +51,7 @@ void terminal_initialize()
 {
 	cur_pos.row = 0;
 	cur_pos.column = 0;
-	cur_color = get_color_code(COLOR_LIGHT_GREY, COLOR_BLACK);
+	cur_color = get_color_code(COLOR_BLACK, COLOR_YELLOW);
 	terminal_buffer = VGA_MEMORY;
 	terminal_clear();
 }

@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-uint16_t* VGA_MEMORY = (uint16_t*) 0xB8000;
+__attribute__((__unused__)) static uint16_t* VGA_MEMORY = (uint16_t*) 0xB8000;
 
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
@@ -23,7 +23,7 @@ typedef enum {
 	COLOR_LIGHT_CYAN = 11,
 	COLOR_LIGHT_RED = 12,
 	COLOR_LIGHT_MAGENTA = 13,
-	COLOR_LIGHT_BROWN = 14,
+	COLOR_YELLOW = 14,
 	COLOR_WHITE = 15,
 } VGAColor;
 
