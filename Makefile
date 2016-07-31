@@ -4,11 +4,12 @@ ISO := build/os-$(ARCH).iso
 
 AS := nasm
 ASFLAGS := -felf64
-CC := $(ARCH)-elf-gcc
+CC := $(ARCH)-elf-gcc --sysroot=../libc/sysroot -isystem=/usr/include
+LD := $(ARCH)-elf-ld
 CSTD := -std=gnu11
 WARNINGS := -Wall -Werror -Wextra
-CFLAGS := $(CSTD) -ffreestanding -nostdlib -nostartfiles $(WARNINGS)
-LIBS := -L../libc/sysroot/usr/lib -lc -lgcc
+LIBS := -nostdlib -lk
+CFLAGS := $(CSTD) -ffreestanding $(LIBS) $(LIBS) $(WARNINGS) 
 
 LINKER_SCRIPT := src/arch/$(ARCH)/linker.ld
 GRUB_CFG := src/arch/$(ARCH)/grub/grub.cfg
@@ -37,7 +38,7 @@ $(ISO): $(KERNEL) $(GRUB_CFG)
 	rm -rfv build/isofiles
 
 $(KERNEL): $(ASSEMBLY_OBJECTS) $(C_OBJECTS) $(LINKER_SCRIPT)
-	ld -n -T $(LINKER_SCRIPT) -o $(KERNEL) $(ASSEMBLY_OBJECTS) $(C_OBJECTS)
+	$(LD) -n -T $(LINKER_SCRIPT) -o $(KERNEL) $(ASSEMBLY_OBJECTS) $(C_OBJECTS)
 
 # compile assembly files
 build/arch/$(ARCH)/%.o: src/arch/$(ARCH)/%.asm

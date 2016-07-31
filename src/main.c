@@ -1,7 +1,14 @@
+
 struct MultibootHeader;
 typedef struct MultibootHeader MultibootHeader;
 
-int main(__attribute__((__unused__))MultibootHeader* mboot_header) 
-{ 
+void kernel_early()
+{
+}
+
+int kmain(__attribute__((__unused__))MultibootHeader* mboot_header) 
+{
+	kernel_early();
+
 	return 666;
 }
