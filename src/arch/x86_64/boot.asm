@@ -28,6 +28,7 @@ BITS 32
 [SECTION .text]
 start:
 	mov esp, stack_top
+	push ebx			; Push a pointer to the multiboot info structure
 	
 	call check_multiboot
     call check_cpuid
