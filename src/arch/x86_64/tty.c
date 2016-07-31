@@ -5,31 +5,43 @@
  
 #include <kernel/tty.h>
 #include <kernel/arch/x86_64/drivers/vga.h>
- 
-size_t terminal_row;
-size_t terminal_column;
-uint8_t terminal_color;
-uint16_t* terminal_buffer;
- 
-void terminal_initialize(void)
+
+typedef struct {
+	size_t row;
+	size_t column;
+} VGAPosition;
+
+typedef struct {
+	VGAPosition pos;
+	VGAColor color;
+} VGAEntry;
+
+static VGAPosition cur_pos;
+static VGAColor cur_color;
+static uint16_t* terminal_buffer;
+
+void terminal_clear()
 {
-	terminal_row = 0;
-	terminal_column = 0;
-	terminal_color = get_color_code(COLOR_LIGHT_GREY, COLOR_BLACK);
-	terminal_buffer = VGA_MEMORY;
-	for ( size_t y = 0; y < VGA_HEIGHT; y++ )
-	{
-		for ( size_t x = 0; x < VGA_WIDTH; x++ )
-		{
+	for (size_t y = 0; y < VGA_HEIGHT; y++) {
+		for (size_t x = 0; x < VGA_WIDTH; x++) {
 			const size_t index = y * VGA_WIDTH + x;
-			terminal_buffer[index] = get_vga_entry(' ', terminal_color);
+			terminal_buffer[index] = get_vga_entry(' ', cur_color);
 		}
 	}
 }
- 
-void terminal_setcolor(uint8_t color)
+
+void terminal_initialize()
 {
-	terminal_color = color;
+	cur_pos.row = 0;
+	cur_pos.column = 0;
+	cur_color = get_color_code(COLOR_LIGHT_GREY, COLOR_BLACK);
+	terminal_buffer = VGA_MEMORY;
+	terminal_clear();
+}
+ 
+void terminal_setcolor(VGAColor color)
+{
+	cur_color = color;
 }
  
 void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
@@ -40,24 +52,22 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)
  
 void terminal_putchar(char c)
 {
-	terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
-	if ( ++terminal_column == VGA_WIDTH )
-	{
-		terminal_column = 0;
-		if ( ++terminal_row == VGA_HEIGHT )
-		{
-			terminal_row = 0;
-		}
+	terminal_putentryat(c, cur_color, cur_pos.column, cur_pos.row);
+	if (++cur_pos.column == VGA_WIDTH) {
+		cur_pos.column = 0;
+
+		if (++cur_pos.row == VGA_HEIGHT)
+			cur_pos.row = 0;
 	}
 }
  
-void terminal_write(const char* data, size_t size)
+void terminal_print(const char* data, size_t size)
 {
-	for ( size_t i = 0; i < size; i++ )
+	for (size_t i = 0; i < size; i++)
 		terminal_putchar(data[i]);
 }
  
-void terminal_writestring(const char* data)
+void terminal_puts(const char* data)
 {
-	terminal_write(data, strlen(data));
+	terminal_print(data, strlen(data));
 }
