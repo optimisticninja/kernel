@@ -1,9 +1,7 @@
 #include <stdio.h>
 
 #include <kernel/tty.h>
-
-// TODO: Define multiboot struct and verify it is correct
-typedef struct MultibootHeader MultibootHeader;
+#include <kernel/arch/x86_64/multiboot_header.h>
 
 void kernel_early()
 {

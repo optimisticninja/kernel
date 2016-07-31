@@ -10,7 +10,7 @@ p3_table:
 p2_table:
     resb 4096
 stack_bottom:
-	resb 64
+	resb 4096
 stack_top:
 
 [SECTION .rodata]
@@ -28,7 +28,7 @@ BITS 32
 [SECTION .text]
 start:
 	mov esp, stack_top
-	push ebx			; Push a pointer to the multiboot info structure
+	mov edi, ebx			; Move multiboot info pointer
 	
 	call check_multiboot
     call check_cpuid

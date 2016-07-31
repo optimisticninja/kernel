@@ -4,7 +4,7 @@ SECTIONS {
 	. = 1M;
 
 	.boot : {
-		*(.multiboot_header)	/* KEEP ensures multiboot is at the beginning */
+		KEEP(*(.multiboot_header))	/* Keep protects from optimization */
 	}
 
 	.text : {
