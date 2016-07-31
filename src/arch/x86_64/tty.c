@@ -118,3 +118,81 @@ void terminal_puts(const char* data)
 {
 	terminal_print(data, strlen(data));
 }
+
+void terminal_printf(const char* format, va_list params)
+{
+	va_list parameters;
+	va_copy(parameters, params);
+ 
+	int written = 0;
+	size_t amount;
+	bool rejected_bad_specifier = false;
+ 
+	while ( *format != '\0' )
+	{
+		if ( *format != '%' )
+		{
+		print_c:
+			amount = 1;
+			while ( format[amount] && format[amount] != '%' )
+				amount++;
+			terminal_print(format, amount);
+			format += amount;
+			written += amount;
+			continue;
+		}
+ 
+		const char* format_begun_at = format;
+ 
+		if ( *(++format) == '%' )
+			goto print_c;
+ 
+		if ( rejected_bad_specifier )
+		{
+		incomprehensible_conversion:
+			rejected_bad_specifier = true;
+			format = format_begun_at;
+			goto print_c;
+		}
+ 
+		if ( *format == 'c' )
+		{
+			format++;
+			char c = (char) va_arg(parameters, int /* char promotes to int */);
+			terminal_print(&c, sizeof(c));
+		}
+		else if ( *format == 's' )
+		{
+			format++;
+			const char* s = va_arg(parameters, const char*);
+			terminal_print(s, strlen(s));
+		}
+		else
+		{
+			goto incomprehensible_conversion;
+		}
+	}
+ 
+	va_end(parameters);
+}
+
+void terminal_print_hex(uint32_t n)
+{
+	int tmp;
+	char no_zeroes = 1;
+
+	terminal_print("0x", sizeof("0x"));
+
+	int i;
+	for (i = 28; i >= 0; i -= 4) {
+		tmp = (n >> i) & 0xF;
+	    if (tmp == 0 && no_zeroes != 0)
+			continue;
+
+	    no_zeroes = 0;
+		if (tmp >= 0xA)
+			terminal_putchar(tmp - 0xA + 'a');
+	    else
+			terminal_putchar(tmp + '0');
+  }
+}
