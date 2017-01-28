@@ -2,7 +2,7 @@
 Basic x86_64 kernel in C. Moved from bitbucket.
 
 ## Requirements
-* Cross compiled Binutils/GCC for x86_64 [Use my script](https://github.com/optimisticninja/scripts/blob/master/cross-compiler-install.sh)
+* Cross compiled Binutils/GCC for x86_64 (Use my [script](https://github.com/optimisticninja/scripts/blob/master/cross-compiler-install.sh) )
 * NASM
 * xorriso
 * QEMU
