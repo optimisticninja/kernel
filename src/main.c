@@ -16,7 +16,7 @@ int kmain()
 	kernel_early();
 	printf("[ KERNEL V0.0.1 (C) 2016 - John Holly ]\n\n");
 
-	printf("Hello, world!%s", "test");
+	printf("Hello, world!\n%s", "String interpolation test");
 
 	while (1) {
 
