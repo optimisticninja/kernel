@@ -23,4 +23,4 @@ $ make iso
 $ make run
 ```
 ## Screenies
-![kernel](http://preview.ibb.co/e9nK5a/kernel.png)
+![kernel](https://anonimag.es/i/6fd97a9ef78f21e5b1196b5b34aa64ba.png)
