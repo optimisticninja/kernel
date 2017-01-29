@@ -99,7 +99,6 @@ void terminal_putchar(char c)
 				cur_pos.row++;
 			}
 			
-			//__attribute__((__unused__))register uint16_t i asm("ax") = ((cur_pos.row-1) * VGA_WIDTH) + cur_pos.column;
 			move_cursor(((cur_pos.row-1) * VGA_WIDTH) + cur_pos.column);
 			scroll();
 			break;
@@ -128,13 +127,11 @@ void terminal_printf(const char* format, va_list params)
 	size_t amount;
 	bool rejected_bad_specifier = false;
  
-	while ( *format != '\0' )
-	{
-		if ( *format != '%' )
-		{
+	while (*format != '\0') {
+		if (*format != '%') {
 		print_c:
 			amount = 1;
-			while ( format[amount] && format[amount] != '%' )
+			while (format[amount] && format[amount] != '%')
 				amount++;
 			terminal_print(format, amount);
 			format += amount;
@@ -144,31 +141,25 @@ void terminal_printf(const char* format, va_list params)
  
 		const char* format_begun_at = format;
  
-		if ( *(++format) == '%' )
+		if (*(++format) == '%')
 			goto print_c;
  
-		if ( rejected_bad_specifier )
-		{
+		if (rejected_bad_specifier) {
 		incomprehensible_conversion:
 			rejected_bad_specifier = true;
 			format = format_begun_at;
 			goto print_c;
 		}
  
-		if ( *format == 'c' )
-		{
+		if (*format == 'c') {
 			format++;
 			char c = (char) va_arg(parameters, int /* char promotes to int */);
 			terminal_print(&c, sizeof(c));
-		}
-		else if ( *format == 's' )
-		{
+		} else if (*format == 's') {
 			format++;
 			const char* s = va_arg(parameters, const char*);
 			terminal_print(s, strlen(s));
-		}
-		else
-		{
+		} else {
 			goto incomprehensible_conversion;
 		}
 	}
@@ -183,16 +174,18 @@ void terminal_print_hex(uint32_t n)
 
 	terminal_print("0x", sizeof("0x"));
 
-	int i;
-	for (i = 28; i >= 0; i -= 4) {
+	for (int i = 28; i >= 0; i -= 4) {
 		tmp = (n >> i) & 0xF;
-	    if (tmp == 0 && no_zeroes != 0)
+		
+		if (tmp == 0 && no_zeroes != 0)
 			continue;
 
-	    no_zeroes = 0;
+		no_zeroes = 0;
+		
 		if (tmp >= 0xA)
 			terminal_putchar(tmp - 0xA + 'a');
-	    else
+		else
 			terminal_putchar(tmp + '0');
-  }
+	}
 }
+

@@ -69,87 +69,84 @@
 
 static inline void cpuid(uint32_t reg, uint32_t* eax, uint32_t* ebx, uint32_t* ecx, uint32_t* edx)
 {
-    __asm__ volatile("cpuid"
-        : "=a" (*eax), "=b" (*ebx), "=c" (*ecx), "=d" (*edx)
-        : "0" (reg));
+	__asm__ volatile("cpuid"
+			: "=a" (*eax), "=b" (*ebx), "=c" (*ecx), "=d" (*edx)
+			: "0" (reg));
 }
 
 void cpu_detect()
 {
-    // Register storage
-    uint32_t eax, ebx, ecx, edx;
+	// Register storage
+	uint32_t eax, ebx, ecx, edx;
 
-    // Function 0x00 - Vendor-ID and Largest Standard Function
-    uint32_t largest_standard_func;
-    char vendor[13];
-    cpuid(0, &largest_standard_func, (uint32_t *)(vendor + 0), (uint32_t *)(vendor + 8), (uint32_t *)(vendor + 4));
-    vendor[12] = '\0';
+	// Function 0x00 - Vendor-ID and Largest Standard Function
+	uint32_t largest_standard_func;
+	char vendor[13];
+	cpuid(0, &largest_standard_func, (uint32_t *)(vendor + 0), (uint32_t *)(vendor + 8), (uint32_t *)(vendor + 4));
+	vendor[12] = '\0';
 
-    ConsolePrint("CPU Vendor: %s\n", vendor);
+	ConsolePrint("CPU Vendor: %s\n", vendor);
 
-    // Function 0x01 - Feature Information
-    if (largest_standard_func >= 0x01) {
-        cpuid(0x01, &eax, &ebx, &ecx, &edx);
+	// Function 0x01 - Feature Information
+	if (largest_standard_func >= 0x01) {
+		cpuid(0x01, &eax, &ebx, &ecx, &edx);
 
-        ConsolePrint("Features:");
+		ConsolePrint("Features:");
 
-        if (edx & EDX_PSE)      ConsolePrint(" PSE");
-        if (edx & EDX_PAE)      ConsolePrint(" PAE");
-        if (edx & EDX_APIC)     ConsolePrint(" APIC");
-        if (edx & EDX_MTRR)     ConsolePrint(" MTRR");
+		if (edx & EDX_PSE)      ConsolePrint(" PSE");
+		if (edx & EDX_PAE)      ConsolePrint(" PAE");
+		if (edx & EDX_APIC)     ConsolePrint(" APIC");
+		if (edx & EDX_MTRR)     ConsolePrint(" MTRR");
 
-        ConsolePrint("\n");
+		ConsolePrint("\n");
 
-        ConsolePrint("Instructions:");
+		ConsolePrint("Instructions:");
 
-        if (edx & EDX_TSC)      ConsolePrint(" TSC");
-        if (edx & EDX_MSR)      ConsolePrint(" MSR");
-        if (edx & EDX_SSE)      ConsolePrint(" SSE");
-        if (edx & EDX_SSE2)     ConsolePrint(" SSE2");
-        if (ecx & ECX_SSE3)     ConsolePrint(" SSE3");
-        if (ecx & ECX_SSSE3)    ConsolePrint(" SSSE3");
-        if (ecx & ECX_SSE41)    ConsolePrint(" SSE41");
-        if (ecx & ECX_SSE42)    ConsolePrint(" SSE42");
-        if (ecx & ECX_AVX)      ConsolePrint(" AVX");
-        if (ecx & ECX_F16C)     ConsolePrint(" F16C");
-        if (ecx & ECX_RDRAND)   ConsolePrint(" RDRAND");
+		if (edx & EDX_TSC)      ConsolePrint(" TSC");
+		if (edx & EDX_MSR)      ConsolePrint(" MSR");
+		if (edx & EDX_SSE)      ConsolePrint(" SSE");
+		if (edx & EDX_SSE2)     ConsolePrint(" SSE2");
+		if (ecx & ECX_SSE3)     ConsolePrint(" SSE3");
+		if (ecx & ECX_SSSE3)    ConsolePrint(" SSSE3");
+		if (ecx & ECX_SSE41)    ConsolePrint(" SSE41");
+		if (ecx & ECX_SSE42)    ConsolePrint(" SSE42");
+		if (ecx & ECX_AVX)      ConsolePrint(" AVX");
+		if (ecx & ECX_F16C)     ConsolePrint(" F16C");
+		if (ecx & ECX_RDRAND)   ConsolePrint(" RDRAND");
 
-        ConsolePrint("\n");
-    }
+		ConsolePrint("\n");
+	}
 
-    // Extended Function 0x00 - Largest Extended Function
+	// Extended Function 0x00 - Largest Extended Function
 
-    uint32_t largestExtendedFunc;
-    cpuid(0x80000000, &largestExtendedFunc, &ebx, &ecx, &edx);
+	uint32_t largestExtendedFunc;
+	cpuid(0x80000000, &largestExtendedFunc, &ebx, &ecx, &edx);
 
-    // Extended Function 0x01 - Extended Feature Bits
+	// Extended Function 0x01 - Extended Feature Bits
 
-    if (largestExtendedFunc >= 0x80000001)
-    {
-        cpuid(0x80000001, &eax, &ebx, &ecx, &edx);
+	if (largestExtendedFunc >= 0x80000001) {
+		cpuid(0x80000001, &eax, &ebx, &ecx, &edx);
 
-        if (edx & EDX_64_BIT)
-        {
-            ConsolePrint("64-bit Architecture\n");
-        }
-    }
+		if (edx & EDX_64_BIT) {
+			ConsolePrint("64-bit Architecture\n");
+		}
+	}
 
-    // Extended Function 0x02-0x04 - Processor Name / Brand String
+	// Extended Function 0x02-0x04 - Processor Name / Brand String
 
-    if (largestExtendedFunc >= 0x80000004)
-    {
-        char name[48];
-        cpuid(0x80000002, (uint32_t *)(name +  0), (uint32_t *)(name +  4), (uint32_t *)(name +  8), (uint32_t *)(name + 12));
-        cpuid(0x80000003, (uint32_t *)(name + 16), (uint32_t *)(name + 20), (uint32_t *)(name + 24), (uint32_t *)(name + 28));
-        cpuid(0x80000004, (uint32_t *)(name + 32), (uint32_t *)(name + 36), (uint32_t *)(name + 40), (uint32_t *)(name + 44));
+	if (largestExtendedFunc >= 0x80000004) {
+		char name[48];
+		cpuid(0x80000002, (uint32_t *)(name +  0), (uint32_t *)(name +  4), (uint32_t *)(name +  8), (uint32_t *)(name + 12));
+		cpuid(0x80000003, (uint32_t *)(name + 16), (uint32_t *)(name + 20), (uint32_t *)(name + 24), (uint32_t *)(name + 28));
+		cpuid(0x80000004, (uint32_t *)(name + 32), (uint32_t *)(name + 36), (uint32_t *)(name + 40), (uint32_t *)(name + 44));
 
-        // Processor name is right justified with leading spaces
-        const char *p = name;
-        while (*p == ' ')
-        {
-            ++p;
-        }
+		// Processor name is right justified with leading spaces
+		const char *p = name;
+		while (*p == ' ') {
+			++p;
+		}
 
-        ConsolePrint("CPU Name: %s\n", p);
-    }
+		ConsolePrint("CPU Name: %s\n", p);
+	}
 }
+

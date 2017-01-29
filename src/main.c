@@ -6,9 +6,7 @@
 void kernel_early()
 {
 	terminal_initialize();
-	terminal_setcolor(get_color_code(COLOR_BLACK, COLOR_YELLOW));
-
-	
+	terminal_setcolor(get_color_code(COLOR_BLACK, COLOR_YELLOW));	
 }
 
 int kmain() 
@@ -18,9 +16,8 @@ int kmain()
 
 	printf("Hello, world!\n%s", "String interpolation test");
 
-	while (1) {
-
-	}
+	while (1);
 
 	return 666;
 }
+

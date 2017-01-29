@@ -39,3 +39,4 @@ static inline uint16_t get_vga_entry(char c, uint8_t color)
 	return c16 | color16 << 8;
 }
 
+
