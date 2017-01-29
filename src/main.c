@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include <kernel/tty.h>
-//#include <kernel/arch/x86_64/cpuid.h>
+#include <kernel/arch/x86_64/cpuid_info.h>
 
 void kernel_early()
 {
@@ -14,7 +14,7 @@ int kmain()
 	kernel_early();
 	printf("[ KERNEL V0.0.1 (C) 2016 - John Holly ]\n\n");
 
-	printf("Hello, world!\n%s", "String interpolation test");
+	cpu_detect();
 
 	while (1);
 
