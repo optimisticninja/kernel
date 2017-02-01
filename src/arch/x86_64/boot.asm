@@ -16,16 +16,14 @@ stack_top:
 [SECTION .rodata]
 gdt64:
 	dq 0 ; zero entry
-
 .code: equ $ - gdt64
-	dq (1<<44) | (1<<47) | (1<<41) | (1<<43) | (1<<53) ; code segment
-
-.data: equ $ - gdt64
-	dq (1<<44) | (1<<47) | (1<<41) ; data segment
-
+	dq (1<<43) | (1<<44) | (1<<47) | (1<<53) ; code segment
 .pointer:
 	dw $ - gdt64 - 1
 	dq gdt64
+
+;.data: equ $ - gdt64
+;	dq (1<<44) | (1<<47) | (1<<41) ; data segment
 
 BITS 32
 [SECTION .text]
@@ -42,12 +40,6 @@ start:
 	call set_up_SSE
 
 	lgdt [gdt64.pointer]
-
-	mov ax, gdt64.data
-	mov ss, ax
-	mov ds, ax
-	mov es, ax
-
 	jmp gdt64.code:long_mode_start
 
 	hlt
