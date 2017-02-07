@@ -1,6 +1,6 @@
 MULTIBOOT_MAGIC			equ 0xE85250D6	; Multiboot 2
-MULTIBOOT_ARCHITECTURE	equ 0			; i386 (protected mode)
-MULTIBOOT_HEADER_LEN	equ (header_end - header_start)
+MULTIBOOT_ARCHITECTURE		equ 0		; i386 (protected mode)
+MULTIBOOT_HEADER_LEN		equ (header_end - header_start)
 MULTIBOOT_CHECKSUM		equ 0x100000000 - (MULTIBOOT_MAGIC + MULTIBOOT_ARCHITECTURE + MULTIBOOT_HEADER_LEN)
 
 [SECTION .multiboot_header]
