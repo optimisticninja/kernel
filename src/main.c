@@ -12,12 +12,16 @@ void kernel_early(struct multiboot_header* multiboot)
 	printf("[ KERNEL V0.0.1 (C) 2016 - John Holly ]\n\n");
 	
 	printf("\n==== MULTIBOOT ====\n");
-	printf("Architecture:\t%s\n", (multiboot->architecture) ? "MIPS" : "i386");
-	printf("Checksum:\t%u\n", multiboot->checksum);
-	printf("Size:\t\t%u\n\n", multiboot->header_length);
+	printf("Multiboot Address:\t%X\n", multiboot);
+	printf("Magic:\t\t\t%X\n", multiboot->magic);
+	printf("Architecture:\t\t%s\n", (multiboot->architecture) ? "MIPS" : "i386");
+	printf("Checksum:\t\t%u\n", multiboot->checksum);
+	printf("Size:\t\t\t%u\n\n", multiboot->header_length);
 	
 	printf("\n==== CPU FEATURES ===\n");
-	cpu_detect();	// Print CPU and Features
+	cpu_detect();
+	
+	
 }
 
 int kmain(struct multiboot_header* multiboot)

@@ -1,5 +1,6 @@
 #include <kernel/tty.h>
 
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -21,6 +22,28 @@ static VGAColor cur_color;
 static uint16_t* terminal_buffer;
 
 extern void move_cursor(uint16_t pos);
+
+#define INT_HEXSTRING_LENGTH ( sizeof(int) * CHAR_BIT / 4 )
+
+/* Defined if I ever support weird architectures. */
+static char const HEXDIGITS[0x10] = {
+	 '0', '1', '2', '3', '4', '5', '6', '7',
+	 '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+};
+
+static void int_to_hexstring(uint64_t value, char result[INT_HEXSTRING_LENGTH+1])
+{
+	int i;
+	result[INT_HEXSTRING_LENGTH] = '\0';
+
+	for (i = INT_HEXSTRING_LENGTH-1; value; i--, value >>= 4) {
+		int d  = value & 0xF;
+		result[i] = HEXDIGITS[d];
+	}
+
+	for ( ; i >= 0; i--)
+		result[i] = '0';
+}
 
 void terminal_clear()
 {
@@ -170,6 +193,11 @@ void terminal_printf(const char* format, va_list params)
 			unsigned u = va_arg(parameters, unsigned);
 			char* ua = itoa(u, NULL, 10);
 			terminal_print(ua, strlen(ua));
+		} else if (*format == 'X') {
+			format++;
+			char buf[INT_HEXSTRING_LENGTH + 1];
+			int_to_hexstring(va_arg(parameters, uint64_t), buf);
+			terminal_print(buf, strlen(buf));
 		} else {
 			goto incomprehensible_conversion;
 		}
